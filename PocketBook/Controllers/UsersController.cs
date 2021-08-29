@@ -35,5 +35,57 @@ namespace PocketBook.Controllers
 
             return new JsonResult("Something went wrong") {StatusCode = 500};
         }
+
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetItem(Guid id)
+        {
+            var user = await _unitOfWork.Users.GetById(id);
+
+            if(user == null)
+            {
+                return NotFound(); // 404 status code
+            }
+
+            return Ok(user);
+
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Get()
+        {
+            var users = await _unitOfWork.Users.All();
+
+            return Ok(users);
+        }
+
+        [HttpPatch("{id}")]
+        public async Task<IActionResult> UpdateItem(Guid id, User user)
+        {
+            if(id != user.Id)
+            {
+                return BadRequest();
+            }
+
+            await _unitOfWork.Users.Upsert(user);
+            await _unitOfWork.CompleteAsync();
+
+            return NoContent();
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteItem(Guid id)
+        {
+            var item = await _unitOfWork.Users.GetById(id);
+
+            if(item == null)
+            {
+                return BadRequest();
+            }
+
+            await _unitOfWork.Users.Delete(id);
+            await _unitOfWork.CompleteAsync();
+
+            return Ok(item);
+        }
     }
 }

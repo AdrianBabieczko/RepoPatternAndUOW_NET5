@@ -10,14 +10,15 @@ namespace PocketBook.Core.Repositories
 {
     public class GenericRepository<T> : IGenericRepository<T> where T: class
     {
-        protected ApplicationDbContext context;
+        protected ApplicationDbContext _context;
         protected DbSet<T> dbSet;
         protected readonly ILogger _logger;
 
-        public GenericRepository(ApplicationDbContext _context, ILogger logger)
+        public GenericRepository(ApplicationDbContext context, ILogger logger)
         {
-            context = _context;
-            logger = _logger;
+            _context = context;
+            _logger = logger;
+            dbSet = context.Set<T>();
         }
 
         public virtual async Task<IEnumerable<T>> All()
